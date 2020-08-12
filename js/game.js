@@ -8,7 +8,8 @@ const fieldType = {
     open: 'field-open',
     close: 'field-close',
     mine: 'field-mine',
-    flag: 'field-flag'
+    flag: 'field-flag',
+    flagOnMine: 'field-flag-on-mine'
 };
 
 
@@ -136,15 +137,29 @@ const game = {
             console.log(`right clicked coordinates: ${cFieldPos.x}x${cFieldPos.y}; flag left: ${mineLeftCounter.value}`);  // Note: the development code.
 
             switch (cField.className) {  // the field type
-                case fieldType.close || fieldType.mine:
+                // closed field cases
+                case fieldType.close:
                     if (mineLeftCounter.value > 0) {
                         cField.setAttribute('class', fieldType.flag);
                         mineLeftCounter.value--
                     }
                     break;
 
+                case fieldType.mine:
+                    if (mineLeftCounter.value > 0) {
+                        cField.setAttribute('class', fieldType.flagOnMine);
+                        mineLeftCounter.value--
+                    }
+                    break;
+
+                // flaged fields cases
                 case fieldType.flag:
                     cField.setAttribute('class', fieldType.close);
+                    mineLeftCounter.value++
+                    break;
+
+                case fieldType.flagOnMine:
+                    cField.setAttribute('class', fieldType.mine);
                     mineLeftCounter.value++
                     break;
             }

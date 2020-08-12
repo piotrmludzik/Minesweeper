@@ -57,3 +57,9 @@
     width: 16px;
     background: url('/img/flag.png');
 }
+
+.game-field .row .field-flag-on-mine {
+    height: 16px;
+    width: 16px;
+    background: url('/img/flag.png');
+}
