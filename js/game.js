@@ -132,16 +132,17 @@ const game = {
             };
 
             // ------------- placeTheFlagHandler() main code -------------
-            console.log(`right clicked coordinates: ${cFieldPos.x}x${cFieldPos.y}`);  // Note: the development code.
-
-            // the flag logic
             switch (cField.className) {  // the field type
                 case fieldType.empty:
-                    cField.setAttribute('class', fieldType.flag);
+                    if (mineLeftCounter.value > 0) {
+                        cField.setAttribute('class', fieldType.flag);
+                        mineLeftCounter.value--
+                    }
                     break;
 
                 case fieldType.flag:
                     cField.setAttribute('class', fieldType.empty);
+                    mineLeftCounter.value++
                     break;
             }
 
@@ -149,6 +150,10 @@ const game = {
             event.preventDefault()  
             return false;
         }
+
+        // ------------- engine() main code -------------
+        let mineLeftCounter = document.querySelector('#mine-left-counter');
+        mineLeftCounter.value = mineCount;
 
         const boardContainer = document.querySelector('.game-field');
         boardContainer.addEventListener('click', clickHandlerOnField);
