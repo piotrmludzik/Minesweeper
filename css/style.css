@@ -45,8 +45,8 @@
     background: url('/img/open-field.png');
 }
 
-.game-field .row .show-mines {
+.game-field .row .mine {
     height: 16px;
     width: 16px;
-    background: url('/img/mine.png');
+    background: url('/img/closed-field.png');
 }

@@ -111,8 +111,15 @@ const game = {
                     cField.setAttribute('class', 'open-field');
                     if (mineNumber > 0) { cField.textContent = mineNumber; }
                     break;
+
                 case fieldType.mine:
-                    cField.setAttribute('class', 'show-mines');
+                    const rules = document.styleSheets[0].cssRules;
+                    for (index in rules) {
+                        if (rules[index].selectorText === '.game-field .row .mine') {
+                            rules[index].style.background = 'url("/img/mine.png")';
+                            break;
+                        }
+                    }
                     break;
             }
         }
