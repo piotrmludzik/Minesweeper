@@ -50,3 +50,9 @@
     width: 16px;
     background: url('/img/closed-field.png');
 }
+
+.game-field .row .flag {
+    height: 16px;
+    width: 16px;
+    background: url('/img/flag.png');
+}

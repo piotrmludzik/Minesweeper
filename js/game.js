@@ -7,7 +7,7 @@ const mineCount = parseInt(urlParams.get('mines'));
 const fieldType = {
     empty: 'field',
     mine: 'field mine',
-    flag: 'field flag'
+    flag: 'flag'
 };
 
 
@@ -124,8 +124,35 @@ const game = {
             }
         }
 
+        function placeTheFlagHandler(event) {
+            const cField = event.target;
+            const cFieldPos = {
+                x: parseInt(cField.dataset.col),
+                y: parseInt(cField.dataset.row)
+            };
+
+            // ------------- placeTheFlagHandler() main code -------------
+            console.log(`right clicked coordinates: ${cFieldPos.x}x${cFieldPos.y}`);  // Note: the development code.
+
+            // the flag logic
+            switch (cField.className) {  // the field type
+                case fieldType.empty:
+                    cField.setAttribute('class', fieldType.flag);
+                    break;
+
+                case fieldType.flag:
+                    cField.setAttribute('class', fieldType.empty);
+                    break;
+            }
+
+            // prevent to show the menu
+            event.preventDefault()  
+            return false;
+        }
+
         const boardContainer = document.querySelector('.game-field');
         boardContainer.addEventListener('click', clickHandlerOnField);
+        boardContainer.addEventListener('contextmenu', placeTheFlagHandler);
     }
 };
 
