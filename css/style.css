@@ -34,25 +34,25 @@
     align-items: center;
 }
 
-.game-field .row .field {
+.game-field .row .field-close {
     height: 16px;
     width: 16px;
     background: url('/img/closed-field.png');
 }
 
-.game-field .row .open-field {
+.game-field .row .field-open {
     height: 16px;
     width: 16px;
     background: url('/img/open-field.png');
 }
 
-.game-field .row .mine {
+.game-field .row .field-mine {
     height: 16px;
     width: 16px;
     background: url('/img/closed-field.png');
 }
 
-.game-field .row .flag {
+.game-field .row .field-flag {
     height: 16px;
     width: 16px;
     background: url('/img/flag.png');

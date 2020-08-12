@@ -5,9 +5,10 @@ const rows = parseInt(urlParams.get('rows'));
 const cols = parseInt(urlParams.get('cols'));
 const mineCount = parseInt(urlParams.get('mines'));
 const fieldType = {
-    empty: 'field',
-    mine: 'field mine',
-    flag: 'flag'
+    open: 'field-open',
+    close: 'field-close',
+    mine: 'field-mine',
+    flag: 'field-flag'
 };
 
 
@@ -53,7 +54,7 @@ const game = {
         function addCell (rowElement, row, col, isMine) {
             rowElement.insertAdjacentHTML(
                 'beforeend',
-                `<div class="field${isMine ? ' mine' : ''}" 
+                `<div class="field-${isMine ? 'mine' : 'close'}" 
                             data-row="${row}" 
                             data-col="${col}"></div>`);
         }
@@ -106,16 +107,16 @@ const game = {
 
             // The game main logic
             switch (cField.className) {  // the field type
-                case fieldType.empty:
+                case fieldType.close:
                     let mineNumber = checkNeighborMineNumber();
-                    cField.setAttribute('class', 'open-field');
+                    cField.setAttribute('class', fieldType.open);
                     if (mineNumber > 0) { cField.textContent = mineNumber; }
                     break;
 
                 case fieldType.mine:
                     const rules = document.styleSheets[0].cssRules;
                     for (index in rules) {
-                        if (rules[index].selectorText === '.game-field .row .mine') {
+                        if (rules[index].selectorText === '.game-field .row .field-mine') {
                             rules[index].style.background = 'url("/img/mine.png")';
                             break;
                         }
@@ -132,8 +133,10 @@ const game = {
             };
 
             // ------------- placeTheFlagHandler() main code -------------
+            console.log(`right clicked coordinates: ${cFieldPos.x}x${cFieldPos.y}; flag left: ${mineLeftCounter.value}`);  // Note: the development code.
+
             switch (cField.className) {  // the field type
-                case fieldType.empty:
+                case fieldType.close || fieldType.mine:
                     if (mineLeftCounter.value > 0) {
                         cField.setAttribute('class', fieldType.flag);
                         mineLeftCounter.value--
@@ -141,7 +144,7 @@ const game = {
                     break;
 
                 case fieldType.flag:
-                    cField.setAttribute('class', fieldType.empty);
+                    cField.setAttribute('class', fieldType.close);
                     mineLeftCounter.value++
                     break;
             }
