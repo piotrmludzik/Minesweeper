@@ -1,3 +1,5 @@
+/* ---------------------------------------- statistics ----------------------------------------- */
+
 .stats {
     width: 160px;
     margin: 0 auto;
@@ -10,22 +12,41 @@
     width: 50px;
 }
 
+
+/* ---------------------------------------- game fields ---------------------------------------- */
+
 .game-field {
     margin: 0 auto;
+    padding: 0;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    text-align: center;
+    font-family: sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: black;
 }
 
 .game-field .row {
-    height: 16px;
     display: flex;
+    align-items: center;
 }
 
 .game-field .row .field {
     height: 16px;
     width: 16px;
     background: url('/img/closed-field.png');
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+}
+
+.game-field .row .open-field {
+    height: 16px;
+    width: 16px;
+    background: url('/img/open-field.png');
+}
+
+.game-field .row .show-mines {
+    height: 16px;
+    width: 16px;
+    background: url('/img/mine.png');
 }
