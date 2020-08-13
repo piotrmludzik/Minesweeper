@@ -1,7 +1,22 @@
+/* ------------------------------------- main page styles -------------------------------------- */
+
+body {
+    font-family: sans-serif;
+    background: lightgray;
+}
+
+h1 {
+    margin: 0;
+    padding: 0;
+    color: white;
+    text-align: center;
+}
+
+
 /* ---------------------------------------- statistics ----------------------------------------- */
 
 .stats {
-    width: 160px;
+    width: 220px;
     margin: 0 auto;
     padding: 20px;
     display: flex;
@@ -10,9 +25,15 @@
 
 .stats input {
     width: 50px;
+    font-size: 1em;
     text-align: center;
 }
 
+#game-button {
+    height: 39px;
+    width: 39px;
+
+}
 
 /* ---------------------------------------- game fields ---------------------------------------- */
 
@@ -23,8 +44,7 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    font-family: sans-serif;
-    font-size: 12px;
+    font-size: 16px;
     font-weight: bold;
     color: black;
 }
@@ -35,31 +55,19 @@
 }
 
 .game-field .row .field-close {
-    height: 16px;
-    width: 16px;
-    background: url('/img/closed-field.png');
+    height: 24px;
+    width: 24px;
+    background: url('/img/field-closed.png');
 }
 
 .game-field .row .field-open {
-    height: 16px;
-    width: 16px;
-    background: url('/img/open-field.png');
+    height: 24px;
+    width: 24px;
+    background: url('/img/field-open.png');
 }
 
 .game-field .row .field-mine {
-    height: 16px;
-    width: 16px;
-    background: url('/img/closed-field.png');
-}
-
-.game-field .row .field-flag {
-    height: 16px;
-    width: 16px;
-    background: url('/img/flag.png');
-}
-
-.game-field .row .field-flag-on-mine {
-    height: 16px;
-    width: 16px;
-    background: url('/img/flag.png');
+    height: 24px;
+    width: 24px;
+    background: url('/img/field-closed.png');
 }

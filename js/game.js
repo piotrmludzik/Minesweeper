@@ -8,16 +8,15 @@ const fieldType = {
     open: 'field-open',
     close: 'field-close',
     mine: 'field-mine',
-    flag: 'field-flag',
-    flagOnMine: 'field-flag-on-mine'
+    flag: 'field-flag'
 };
 
 
 const game = {
     init: function () {
-        function drawBoard () {
+        function drawBoard() {
             const minePlaces = getRandomMineIndexes(mineCount, cols, rows);
-    
+
             let gameField = document.querySelector(".game-field");
             setGameFieldSize(gameField, rows, cols);
             let cellIndex = 0
@@ -30,7 +29,7 @@ const game = {
             }
         }
 
-        function getRandomMineIndexes (mineCount, cols, rows) {
+        function getRandomMineIndexes(mineCount, cols, rows) {
             const cellCount = cols * rows;
             let mines = new Set();
             do {
@@ -38,33 +37,34 @@ const game = {
             } while (mines.size < mineCount && mines.size < cellCount);
             return mines;
         }
-    
-        function setGameFieldSize (gameField, rows, cols) {
+
+        function setGameFieldSize(gameField, rows, cols) {
             gameField.style.width = (gameField.dataset.cellWidth * rows) + 'px';
             gameField.style.height = (gameField.dataset.cellHeight * cols) + 'px';
         }
-    
-        function addRow (gameField) {
+
+        function addRow(gameField) {
             gameField.insertAdjacentHTML(
                 'beforeend',
                 '<div class="row"></div>'
             );
             return gameField.lastElementChild;
         }
-    
-        function addCell (rowElement, row, col, isMine) {
+
+        function addCell(rowElement, row, col, isMine) {
             rowElement.insertAdjacentHTML(
                 'beforeend',
                 `<div class="field-${isMine ? 'mine' : 'close'}" 
                             data-row="${row}" 
-                            data-col="${col}"></div>`);
+                            data-col="${col}"
+                            data-flagged="false"></div>`);
         }
 
         drawBoard();
     },
 
     engine: function () {
-        function clickHandlerOnField(event) {
+        function handlerClickOnField(event) {
             const cField = event.target;
             const cFieldPos = {
                 x: parseInt(cField.dataset.col),
@@ -75,7 +75,7 @@ const game = {
                 const board = Array.from(document.querySelectorAll('div[data-row]'));  // all fields on the board
 
                 function getFieldToCheck(seekedX, seekedY) {
-                    let field = board.find(function(node) {
+                    let field = board.find(function (node) {
                         return parseInt(node.dataset.col) === seekedX && parseInt(node.dataset.row) === seekedY;
                     });
                     return field
@@ -90,7 +90,7 @@ const game = {
 
                         // boundary conditions
                         if (x == 0 && y === 0) { continue; }  // the own field
-                        if (posX < 0 || posX >= cols  || posY < 0 || posY >= rows) {continue; }  // out of the board
+                        if (posX < 0 || posX >= cols || posY < 0 || posY >= rows) { continue; }  // out of the board
 
                         // looks for the mine
                         let fieldToCheck = getFieldToCheck(posX, posY);
@@ -103,8 +103,10 @@ const game = {
                 return mineNumber;
             }
 
-            // ------------- clickHandlerOnField() main code -------------
+            // ------------- handlerClickOnField() main code -------------
             console.log(`clicked coordinates: ${cFieldPos.x}x${cFieldPos.y}; field type: ${cField.className}`);  // Note: the development code.
+
+            if (cField.dataset.flagged === "true") { return; };
 
             // The game main logic
             switch (cField.className) {  // the field type
@@ -126,46 +128,36 @@ const game = {
             }
         }
 
-        function placeTheFlagHandler(event) {
+        function handlerPlaceTheFlag(event) {
             const cField = event.target;
             const cFieldPos = {
                 x: parseInt(cField.dataset.col),
                 y: parseInt(cField.dataset.row)
             };
 
-            // ------------- placeTheFlagHandler() main code -------------
+            // ------------- handlerPlaceTheFlag() main code -------------
             console.log(`right clicked coordinates: ${cFieldPos.x}x${cFieldPos.y}; flag left: ${mineLeftCounter.value}`);  // Note: the development code.
 
-            switch (cField.className) {  // the field type
-                // closed field cases
-                case fieldType.close:
-                    if (mineLeftCounter.value > 0) {
-                        cField.setAttribute('class', fieldType.flag);
-                        mineLeftCounter.value--
-                    }
-                    break;
+            if (cField.className === fieldType.close || cField.className === fieldType.mine) {
+                switch (cField.dataset.flagged) {
+                    case "false":  // place the flag
+                        if (mineLeftCounter.value > 0) {
+                            cField.dataset.flagged = "true";
+                            cField.style.background = 'url("/img/flag.png")';
+                            mineLeftCounter.value--
+                        }
+                        break;
 
-                case fieldType.mine:
-                    if (mineLeftCounter.value > 0) {
-                        cField.setAttribute('class', fieldType.flagOnMine);
-                        mineLeftCounter.value--
-                    }
-                    break;
-
-                // flaged fields cases
-                case fieldType.flag:
-                    cField.setAttribute('class', fieldType.close);
-                    mineLeftCounter.value++
-                    break;
-
-                case fieldType.flagOnMine:
-                    cField.setAttribute('class', fieldType.mine);
-                    mineLeftCounter.value++
-                    break;
-            }
+                    case "true":  // remove the flag
+                        cField.dataset.flagged = "false";
+                        cField.style.background = 'url("/img/field-closed.png")';
+                        mineLeftCounter.value++
+                        break;
+                }
+            };
 
             // prevent to show the menu
-            event.preventDefault()  
+            event.preventDefault()
             return false;
         }
 
@@ -174,8 +166,8 @@ const game = {
         mineLeftCounter.value = mineCount;
 
         const boardContainer = document.querySelector('.game-field');
-        boardContainer.addEventListener('click', clickHandlerOnField);
-        boardContainer.addEventListener('contextmenu', placeTheFlagHandler);
+        boardContainer.addEventListener('click', handlerClickOnField);
+        boardContainer.addEventListener('contextmenu', handlerPlaceTheFlag);
     }
 };
 
