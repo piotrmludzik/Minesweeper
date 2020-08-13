@@ -1,4 +1,3 @@
-
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const rows = parseInt(urlParams.get('rows'));
@@ -64,7 +63,7 @@ const game = {
     },
 
     engine: function () {
-        function handlerClickOnGameButton(event) {
+        function createNewGame() {
             // delete old game fields
             let board = document.querySelectorAll('.row');
             for (row = 0; row < board.length; row++) {
@@ -75,7 +74,7 @@ const game = {
             game.init();
         }
 
-        function handlerClickOnField(event) {
+        function clickOnFieldHandler(event) {
             const cField = event.target;
             const cFieldPos = {
                 x: parseInt(cField.dataset.col),
@@ -114,12 +113,9 @@ const game = {
                 return mineNumber;
             }
 
-            // ------------- handlerClickOnField() main code -------------
-            console.log(`clicked coordinates: ${cFieldPos.x}x${cFieldPos.y}; field type: ${cField.className}`);  // Note: the development code.
-
+            // ------------- clickOnFieldHandler() main code -------------
             if (cField.dataset.flagged === "true") { return; };
 
-            // The game main logic
             switch (cField.className) {  // the field type
                 case fieldType.close:
                     let mineNumber = checkNeighborMineNumber();
@@ -128,6 +124,9 @@ const game = {
                     break;
 
                 case fieldType.mine:
+                    cField.style.backgroundImage = 'url("/img/mine-selected.png")';
+
+                    // schow all mines
                     const rules = document.styleSheets[0].cssRules;
                     for (index in rules) {
                         if (rules[index].selectorText === '.game-field .row .field-mine') {
@@ -139,30 +138,24 @@ const game = {
             }
         }
 
-        function handlerPlaceTheFlag(event) {
+        function flagOnFieldHandler(event) {
             const cField = event.target;
-            const cFieldPos = {
-                x: parseInt(cField.dataset.col),
-                y: parseInt(cField.dataset.row)
-            };
 
-            // ------------- handlerPlaceTheFlag() main code -------------
-            console.log(`right clicked coordinates: ${cFieldPos.x}x${cFieldPos.y}; flag left: ${mineLeftCounter.value}`);  // Note: the development code.
-
+            // ------------- flagOnFieldHandler() main code -------------
             if (cField.className === fieldType.close || cField.className === fieldType.mine) {
                 switch (cField.dataset.flagged) {
                     case "false":  // place the flag
                         if (mineLeftCounter.value > 0) {
                             cField.dataset.flagged = "true";
-                            cField.style.background = 'url("/img/flag.png")';
-                            mineLeftCounter.value--
+                            cField.style.backgroundImage = 'url("/img/flag.png")';
+                            mineLeftCounter.value--;
                         }
                         break;
 
                     case "true":  // remove the flag
                         cField.dataset.flagged = "false";
-                        cField.style.background = 'url("/img/field-closed.png")';
-                        mineLeftCounter.value++
+                        cField.removeAttribute('style');
+                        mineLeftCounter.value++;
                         break;
                 }
             };
@@ -177,11 +170,11 @@ const game = {
         mineLeftCounter.value = mineCount;
 
         const gameButton = document.querySelector('#game-button');
-        gameButton.addEventListener('click', handlerClickOnGameButton);
+        gameButton.addEventListener('click', createNewGame);
 
         const boardContainer = document.querySelector('.game-field');
-        boardContainer.addEventListener('click', handlerClickOnField);
-        boardContainer.addEventListener('contextmenu', handlerPlaceTheFlag);
+        boardContainer.addEventListener('click', clickOnFieldHandler);
+        boardContainer.addEventListener('contextmenu', flagOnFieldHandler);
     }
 };
 
