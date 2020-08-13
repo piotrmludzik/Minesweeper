@@ -64,6 +64,17 @@ const game = {
     },
 
     engine: function () {
+        function handlerClickOnGameButton(event) {
+            // delete old game fields
+            let board = document.querySelectorAll('.row');
+            for (row = 0; row < board.length; row++) {
+                board.item(row).remove();
+            }
+
+            // create new board
+            game.init();
+        }
+
         function handlerClickOnField(event) {
             const cField = event.target;
             const cFieldPos = {
@@ -164,6 +175,9 @@ const game = {
         // ------------- engine() main code -------------
         let mineLeftCounter = document.querySelector('#mine-left-counter');
         mineLeftCounter.value = mineCount;
+
+        const gameButton = document.querySelector('#game-button');
+        gameButton.addEventListener('click', handlerClickOnGameButton);
 
         const boardContainer = document.querySelector('.game-field');
         boardContainer.addEventListener('click', handlerClickOnField);
