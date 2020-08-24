@@ -79,6 +79,17 @@ function gameInit() {
 }
 
 function gameEngine() {
+    // ----------------------------------------------- common functions ------------------------------------------------
+    function allMinesChangeGraphic(urlGraphic) {
+        const rules = document.styleSheets[0].cssRules;
+        for (let index in rules) {
+            if (rules[index].selectorText === '.game-field .row .field-mine') {
+                rules[index].style.background = urlGraphic;
+                break;
+            }
+        }
+    }
+
     // ---------------------------------------------- checking functions -----------------------------------------------
     function isFlagged(field) {
         return field.dataset.flagged === "true";
@@ -106,11 +117,17 @@ function gameEngine() {
 
     // ----------------------------------------- handlers for event listener ------------------------------------------
     function createNewGameHandler() {
-        // delete old game fields
-        let board = document.querySelectorAll('.row');
-        for (let row = 0; row < board.length; row++) { board.item(row).remove(); }
-        // create new board
-        gameInit();
+        function deleteGameFields() {
+            let board = document.querySelectorAll('.row');
+            for (let row = 0; row < board.length; row++) {
+                board.item(row).remove();
+            }
+        }
+
+        // ------------- createNewGameHandler main code -------------
+        deleteGameFields();
+        allMinesChangeGraphic('url("/img/field-closed.png")')  // hide all mines
+        gameInit();  // create new board
     }
 
     function clickOnFieldHandler(event) {
@@ -152,15 +169,7 @@ function gameEngine() {
 
         function gameOver(field) {
             field.style.backgroundImage = 'url("/img/mine-selected.png")';
-
-            // show all mines
-            const rules = document.styleSheets[0].cssRules;
-            for (let index in rules) {
-                if (rules[index].selectorText === '.game-field .row .field-mine') {
-                    rules[index].style.background = 'url("/img/mine.png")';
-                    break;
-                }
-            }
+            allMinesChangeGraphic('url("/img/mine.png")')  // show all mines
         }
 
         // ------------- clickOnFieldHandler() main code -------------
