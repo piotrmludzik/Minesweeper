@@ -164,29 +164,37 @@ function gameEngine() {
     }
 
     function clickOnFieldHandler(event) {
+        function noMinesInNeighborhood(field) {
+            return !field.textContent;
+        }
+
+        function boundaryConditionNotMet(mainField, neigborField) {
+            return (
+                // the own field
+                (mainField.x === 0 && mainField.y === 0)
+                // out of the board
+                || (neigborField.x < 0 || neigborField.x >= cols || neigborField.y < 0 || neigborField.y >= rows)
+            )
+        }
+
+        function getFieldToCheck(seekedPos) {
+            const board = Array.from(document.querySelectorAll('div[data-row]'));  // all fields on the board
+            return board.find(function (node) {
+                return parseInt(node.dataset.col) === seekedPos.x && parseInt(node.dataset.row) === seekedPos.y;
+            })
+        }
+
         function openField(field, fieldPos) {
             function checkNeighborMineNumber(fieldPos) {
-                function getFieldToCheck(seekedX, seekedY) {
-                    return board.find(function (node) {
-                        return parseInt(node.dataset.col) === seekedX && parseInt(node.dataset.row) === seekedY;
-                    })
-                }
-
-                // ------------- checkNeighborMineNumber() main code -------------
-                const board = Array.from(document.querySelectorAll('div[data-row]'));  // all fields on the board
-
                 let neighborMineNumber = 0;
                 for (let x = -1; x <= 1; x++) {  // loop for cols
                     for (let y = -1; y <= 1; y++) {  // loop for rows
-                        let posX = fieldPos.x + x;
-                        let posY = fieldPos.y + y;
-    
-                        // boundary conditions
-                        if (x === 0 && y === 0) { continue; }  // the own field
-                        if (posX < 0 || posX >= cols || posY < 0 || posY >= rows) { continue; }  // out of the board
+                        let neighborFieldPos = {x: fieldPos.x + x, y: fieldPos.y + y};
+
+                        if (boundaryConditionNotMet(fieldPos, neighborFieldPos)) { continue; }
     
                         // looks for the mine
-                        let fieldToCheck = getFieldToCheck(posX, posY);
+                        let fieldToCheck = getFieldToCheck(neighborFieldPos);
                         if (isMine(fieldToCheck)) { neighborMineNumber++; }
                     }
                 }
@@ -200,6 +208,10 @@ function gameEngine() {
             if (neighborMineNumber > 0) { field.textContent = neighborMineNumber; }
         }
 
+        function openFieldsInNeighborhood(fieldPos) {
+            checkNeighborhoodFields('lookForNoNeighborhoodMine', cFieldPos)
+        }
+
         function gameOver(field) {
             timerStop();
             field.style.backgroundImage = 'url("/img/mine-selected.png")';
@@ -209,15 +221,21 @@ function gameEngine() {
 
         // ------------- clickOnFieldHandler() main code -------------
         const cField = event.target;
-        const cFieldPos = {x: parseInt(cField.dataset.col), y: parseInt(cField.dataset.row)};
 
         if (isTimerNotRunning()) { timerStart(); }
         if (isFlagged(cField)) { return; }  // block the flagged field
 
-        switch (cField.className) {  // the field type
+        cFieldType = cField.className;
+        switch (cFieldType) {
             case fieldType.closed:
+                const cFieldPos = {x: parseInt(cField.dataset.col), y: parseInt(cField.dataset.row)};
+
                 openField(cField, cFieldPos);
+                if (noMinesInNeighborhood(cField)) {
+                    openFieldsInNeighborhood(cFieldPos);
+                }
                 break;
+
             case fieldType.mine:
                 gameOver(cField);
                 break;
@@ -248,6 +266,7 @@ function gameEngine() {
                 case "false":
                     placeFlag();
                     break;
+
                 case "true":
                     removeFlag();
                     break;
