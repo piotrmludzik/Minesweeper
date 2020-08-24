@@ -1,8 +1,16 @@
+// --------------------------------------------------------------------------------------------------------------------
+//                                                    The minesweeper
+// version: 1.0.0
+// contributors: Piotr Młudzik
+// --------------------------------------------------------------------------------------------------------------------
+
+
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const rows = parseInt(urlParams.get('rows'));
 const cols = parseInt(urlParams.get('cols'));
-const mineCount = parseInt(urlParams.get('mines'));
+const mineLeftCounter = document.querySelector('#mine-left-counter');
+
 const fieldType = {
     open: 'field-open',
     close: 'field-close',
@@ -11,23 +19,9 @@ const fieldType = {
 };
 
 
-const game = {
-    init: function () {
-        function drawBoard() {
-            const minePlaces = getRandomMineIndexes(mineCount, cols, rows);
-
-            let gameField = document.querySelector(".game-field");
-            setGameFieldSize(gameField, rows, cols);
-            let cellIndex = 0
-            for (let row = 0; row < rows; row++) {
-                const rowElement = addRow(gameField);
-                for (let col = 0; col < cols; col++) {
-                    addCell(rowElement, row, col, minePlaces.has(cellIndex));
-                    cellIndex++;
-                }
-            }
-        }
-
+// -------------------------------------------------- main functions --------------------------------------------------
+function gameInit() {
+    function drawBoard() {
         function getRandomMineIndexes(mineCount, cols, rows) {
             const cellCount = cols * rows;
             let mines = new Set();
@@ -59,125 +53,171 @@ const game = {
                             data-flagged="false"></div>`);
         }
 
-        drawBoard();
-    },
+        // ------------- drawBoard() main code -------------
+        const minePlaces = getRandomMineIndexes(mineLeftCounter.value, cols, rows);
 
-    engine: function () {
-        function createNewGame() {
-            // delete old game fields
-            let board = document.querySelectorAll('.row');
-            for (row = 0; row < board.length; row++) {
-                board.item(row).remove();
-            }
-
-            // create new board
-            game.init();
-        }
-
-        function clickOnFieldHandler(event) {
-            const cField = event.target;
-            const cFieldPos = {
-                x: parseInt(cField.dataset.col),
-                y: parseInt(cField.dataset.row)
-            };
-
-            function checkNeighborMineNumber() {
-                const board = Array.from(document.querySelectorAll('div[data-row]'));  // all fields on the board
-
-                function getFieldToCheck(seekedX, seekedY) {
-                    let field = board.find(function (node) {
-                        return parseInt(node.dataset.col) === seekedX && parseInt(node.dataset.row) === seekedY;
-                    });
-                    return field
-                }
-
-                // ------------- checkNeighborMineNumber() main code -------------
-                let mineNumber = 0;
-                for (x = -1; x <= 1; x++) {
-                    for (y = -1; y <= 1; y++) {
-                        posX = cFieldPos.x + x;
-                        posY = cFieldPos.y + y;
-
-                        // boundary conditions
-                        if (x == 0 && y === 0) { continue; }  // the own field
-                        if (posX < 0 || posX >= cols || posY < 0 || posY >= rows) { continue; }  // out of the board
-
-                        // looks for the mine
-                        let fieldToCheck = getFieldToCheck(posX, posY);
-                        if (fieldToCheck.className === fieldType.mine) {
-                            mineNumber++;
-                        }
-                    }
-                }
-
-                return mineNumber;
-            }
-
-            // ------------- clickOnFieldHandler() main code -------------
-            if (cField.dataset.flagged === "true") { return; };
-
-            switch (cField.className) {  // the field type
-                case fieldType.close:
-                    let mineNumber = checkNeighborMineNumber();
-                    cField.setAttribute('class', fieldType.open);
-                    if (mineNumber > 0) { cField.textContent = mineNumber; }
-                    break;
-
-                case fieldType.mine:
-                    cField.style.backgroundImage = 'url("/img/mine-selected.png")';
-
-                    // schow all mines
-                    const rules = document.styleSheets[0].cssRules;
-                    for (index in rules) {
-                        if (rules[index].selectorText === '.game-field .row .field-mine') {
-                            rules[index].style.background = 'url("/img/mine.png")';
-                            break;
-                        }
-                    }
-                    break;
+        let gameField = document.querySelector(".game-field");
+        setGameFieldSize(gameField, rows, cols);
+        let cellIndex = 0
+        for (let row = 0; row < rows; row++) {
+            const rowElement = addRow(gameField);
+            for (let col = 0; col < cols; col++) {
+                addCell(rowElement, row, col, minePlaces.has(cellIndex));
+                cellIndex++;
             }
         }
+    }
 
-        function flagOnFieldHandler(event) {
-            const cField = event.target;
-
-            // ------------- flagOnFieldHandler() main code -------------
-            if (cField.className === fieldType.close || cField.className === fieldType.mine) {
-                switch (cField.dataset.flagged) {
-                    case "false":  // place the flag
-                        if (mineLeftCounter.value > 0) {
-                            cField.dataset.flagged = "true";
-                            cField.style.backgroundImage = 'url("/img/flag.png")';
-                            mineLeftCounter.value--;
-                        }
-                        break;
-
-                    case "true":  // remove the flag
-                        cField.dataset.flagged = "false";
-                        cField.removeAttribute('style');
-                        mineLeftCounter.value++;
-                        break;
-                }
-            };
-
-            // prevent to show the menu
-            event.preventDefault()
-            return false;
-        }
-
-        // ------------- engine() main code -------------
-        let mineLeftCounter = document.querySelector('#mine-left-counter');
+    function showMineLeftValue() {
+        const mineCount = parseInt(urlParams.get('mines'));
         mineLeftCounter.value = mineCount;
+    }
 
+    // ------------- init() main code -------------
+    showMineLeftValue();
+    drawBoard();
+}
+
+function gameEngine() {
+    // ---------------------------------------------- checking functions -----------------------------------------------
+    function isFlagged(field) {
+        return field.dataset.flagged === "true";
+    }
+
+    function isMine(field) {
+        return field.className === fieldType.mine;
+    }
+
+    function isNotClosedAndNotMine(field) {
+        return field.className === fieldType.close || field.className === fieldType.mine;
+    }
+
+    // ----------------------------------------- html objects event listeners -----------------------------------------
+    function addGameButtonEventListener () {
         const gameButton = document.querySelector('#game-button');
-        gameButton.addEventListener('click', createNewGame);
+        gameButton.addEventListener('click', createNewGameHandler);
+    }
 
+    function addFieldsEventListener() {
         const boardContainer = document.querySelector('.game-field');
         boardContainer.addEventListener('click', clickOnFieldHandler);
         boardContainer.addEventListener('contextmenu', flagOnFieldHandler);
     }
-};
+
+    // ----------------------------------------- handlers for event listener ------------------------------------------
+    function createNewGameHandler() {
+        // delete old game fields
+        let board = document.querySelectorAll('.row');
+        for (let row = 0; row < board.length; row++) { board.item(row).remove(); }
+        // create new board
+        gameInit();
+    }
+
+    function clickOnFieldHandler(event) {
+        function openField(field, fieldPos) {
+            function checkNeighborMineNumber(fieldPos) {
+                function getFieldToCheck(seekedX, seekedY) {
+                    return board.find(function (node) {
+                        return parseInt(node.dataset.col) === seekedX && parseInt(node.dataset.row) === seekedY;
+                    })
+                }
+
+                // ------------- checkNeighborMineNumber() main code -------------
+                const board = Array.from(document.querySelectorAll('div[data-row]'));  // all fields on the board
+
+                let neighborMineNumber = 0;
+                for (let x = -1; x <= 1; x++) {  // loop for cols
+                    for (let y = -1; y <= 1; y++) {  // loop for rows
+                        let posX = fieldPos.x + x;
+                        let posY = fieldPos.y + y;
+    
+                        // boundary conditions
+                        if (x === 0 && y === 0) { continue; }  // the own field
+                        if (posX < 0 || posX >= cols || posY < 0 || posY >= rows) { continue; }  // out of the board
+    
+                        // looks for the mine
+                        let fieldToCheck = getFieldToCheck(posX, posY);
+                        if (isMine(fieldToCheck)) { neighborMineNumber++; }
+                    }
+                }
+    
+                return neighborMineNumber;
+            }
+
+            // ------------- openField() main code -------------
+            field.setAttribute('class', fieldType.open);
+            let neighborMineNumber = checkNeighborMineNumber(fieldPos);
+            if (neighborMineNumber > 0) { field.textContent = neighborMineNumber; }
+        }
+
+        function gameOver(field) {
+            field.style.backgroundImage = 'url("/img/mine-selected.png")';
+
+            // show all mines
+            const rules = document.styleSheets[0].cssRules;
+            for (let index in rules) {
+                if (rules[index].selectorText === '.game-field .row .field-mine') {
+                    rules[index].style.background = 'url("/img/mine.png")';
+                    break;
+                }
+            }
+        }
+
+        // ------------- clickOnFieldHandler() main code -------------
+        const cField = event.target;
+        const cFieldPos = {x: parseInt(cField.dataset.col), y: parseInt(cField.dataset.row)};
+
+        if (isFlagged(cField)) { return; }  // block the flagged field
+
+        switch (cField.className) {  // the field type
+            case fieldType.close:
+                openField(cField, cFieldPos);
+                break;
+            case fieldType.mine:
+                gameOver(cField);
+                break;
+        }
+    }
+
+    function flagOnFieldHandler(event) {
+        function placeFlag() {
+            if (mineLeftCounter.value > 0) {
+                cField.dataset.flagged = "true";
+                cField.style.backgroundImage = 'url("/img/flag.png")';
+                mineLeftCounter.value--;
+            }
+        }
+
+        function removeFlag() {
+            cField.dataset.flagged = "false";
+            cField.removeAttribute('style');
+            mineLeftCounter.value++;
+        }
+
+        // ------------- flagOnFieldHandler() main code -------------
+        const cField = event.target;
+        if (isNotClosedAndNotMine(cField)) {
+            switch (cField.dataset.flagged) {
+                case "false":
+                    placeFlag();
+                    break;
+                case "true":
+                    removeFlag();
+                    break;
+            }
+        }
+
+        // prevent to show the menu
+        event.preventDefault();
+        return false;
+    }
+
+    // ------------- engine() main code -------------
+    addGameButtonEventListener();
+    addFieldsEventListener();
+}
 
 
-game.init();
-game.engine();
+// ------------------------------------------------- the main script --------------------------------------------------
+gameInit();
+gameEngine();
