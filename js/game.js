@@ -10,6 +10,7 @@ const urlParams = new URLSearchParams(queryString);
 const rows = parseInt(urlParams.get('rows'));
 const cols = parseInt(urlParams.get('cols'));
 const mineLeftCounter = document.querySelector('#mine-left-counter');
+const timerCounter = document.querySelector('#elapsed-time-counter');
 
 const fieldType = {
     open: 'field-open',
@@ -17,6 +18,8 @@ const fieldType = {
     mine: 'field-mine',
     flag: 'field-flag'
 };
+
+let timerIntervalID = null;
 
 
 // -------------------------------------------------- main functions --------------------------------------------------
@@ -90,6 +93,24 @@ function gameEngine() {
         }
     }
 
+    // ------------------------------------------------ timer functions ------------------------------------------------
+    function showTime() {
+        timerCounter.value++;
+    }
+
+    function timerStart() {
+        timerIntervalID = setInterval(showTime, 1000);
+    }
+
+    function timerStop() {
+        clearInterval(timerIntervalID);
+        timerIntervalID = null;
+    }
+
+    function timerReset() {
+        timerCounter.value = 0;
+    }
+
     // ---------------------------------------------- checking functions -----------------------------------------------
     function isFlagged(field) {
         return field.dataset.flagged === "true";
@@ -101,6 +122,10 @@ function gameEngine() {
 
     function isNotClosedAndNotMine(field) {
         return field.className === fieldType.closed || field.className === fieldType.mine;
+    }
+
+    function isTimerNotRunning() {
+        return timerIntervalID === null;
     }
 
     // ----------------------------------------- html objects event listeners -----------------------------------------
@@ -134,6 +159,7 @@ function gameEngine() {
         deleteGameFields();
         allMinesChangeGraphic('url("/img/field-closed.png")')  // hide all mines
         gameInit();  // create new board
+        timerReset();
         addFieldsEventListener();
     }
 
@@ -175,6 +201,7 @@ function gameEngine() {
         }
 
         function gameOver(field) {
+            timerStop();
             field.style.backgroundImage = 'url("/img/mine-selected.png")';
             allMinesChangeGraphic('url("/img/mine.png")');  // show all mines
             removeFieldsEventListener();  // block fields from clicking
@@ -184,6 +211,7 @@ function gameEngine() {
         const cField = event.target;
         const cFieldPos = {x: parseInt(cField.dataset.col), y: parseInt(cField.dataset.row)};
 
+        if (isTimerNotRunning()) { timerStart(); }
         if (isFlagged(cField)) { return; }  // block the flagged field
 
         switch (cField.className) {  // the field type
@@ -212,6 +240,8 @@ function gameEngine() {
         }
 
         // ------------- flagOnFieldHandler() main code -------------
+        if (isTimerNotRunning()) { timerStart(); }
+
         const cField = event.target;
         if (isNotClosedAndNotMine(cField)) {
             switch (cField.dataset.flagged) {
