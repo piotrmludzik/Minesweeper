@@ -115,6 +115,12 @@ function gameEngine() {
         boardContainer.addEventListener('contextmenu', flagOnFieldHandler);
     }
 
+    function removeFieldsEventListener() {
+        const boardContainer = document.querySelector('.game-field');
+        boardContainer.removeEventListener('click', clickOnFieldHandler);
+        boardContainer.removeEventListener('contextmenu', flagOnFieldHandler);
+    }
+
     // ----------------------------------------- handlers for event listener ------------------------------------------
     function createNewGameHandler() {
         function deleteGameFields() {
@@ -128,6 +134,7 @@ function gameEngine() {
         deleteGameFields();
         allMinesChangeGraphic('url("/img/field-closed.png")')  // hide all mines
         gameInit();  // create new board
+        addFieldsEventListener();
     }
 
     function clickOnFieldHandler(event) {
@@ -169,7 +176,8 @@ function gameEngine() {
 
         function gameOver(field) {
             field.style.backgroundImage = 'url("/img/mine-selected.png")';
-            allMinesChangeGraphic('url("/img/mine.png")')  // show all mines
+            allMinesChangeGraphic('url("/img/mine.png")');  // show all mines
+            removeFieldsEventListener();  // block fields from clicking
         }
 
         // ------------- clickOnFieldHandler() main code -------------
