@@ -13,7 +13,7 @@ const mineLeftCounter = document.querySelector('#mine-left-counter');
 
 const fieldType = {
     open: 'field-open',
-    close: 'field-close',
+    closed: 'field-closed',
     mine: 'field-mine',
     flag: 'field-flag'
 };
@@ -47,7 +47,7 @@ function gameInit() {
         function addCell(rowElement, row, col, isMine) {
             rowElement.insertAdjacentHTML(
                 'beforeend',
-                `<div class="field-${isMine ? 'mine' : 'close'}" 
+                `<div class="field-${isMine ? 'mine' : 'closed'}" 
                             data-row="${row}" 
                             data-col="${col}"
                             data-flagged="false"></div>`);
@@ -100,7 +100,7 @@ function gameEngine() {
     }
 
     function isNotClosedAndNotMine(field) {
-        return field.className === fieldType.close || field.className === fieldType.mine;
+        return field.className === fieldType.closed || field.className === fieldType.mine;
     }
 
     // ----------------------------------------- html objects event listeners -----------------------------------------
@@ -179,7 +179,7 @@ function gameEngine() {
         if (isFlagged(cField)) { return; }  // block the flagged field
 
         switch (cField.className) {  // the field type
-            case fieldType.close:
+            case fieldType.closed:
                 openField(cField, cFieldPos);
                 break;
             case fieldType.mine:

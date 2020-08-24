@@ -54,7 +54,7 @@ h1 {
     align-items: center;
 }
 
-.game-field .row .field-close {
+.game-field .row .field-closed {
     height: 24px;
     width: 24px;
     background: url('/img/field-closed.png');
