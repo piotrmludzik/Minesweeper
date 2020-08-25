@@ -60,10 +60,10 @@ h1 {
     background: url('/img/field-closed.png');
 }
 
-.game-field .row .field-open {
+.game-field .row .field-opended {
     height: 24px;
     width: 24px;
-    background: url('/img/field-open.png');
+    background: url('/img/field-opended.png');
 }
 
 .game-field .row .field-mine {

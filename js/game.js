@@ -13,7 +13,7 @@ const mineLeftCounter = document.querySelector('#mine-left-counter');
 const timerCounter = document.querySelector('#elapsed-time-counter');
 
 const fieldType = {
-    open: 'field-open',
+    opended: 'field-opended',
     closed: 'field-closed',
     mine: 'field-mine',
     flag: 'field-flag'
@@ -47,10 +47,10 @@ function gameInit() {
             return gameField.lastElementChild;
         }
 
-        function addCell(rowElement, row, col, isMine) {
+        function addCell(rowElement, row, col, isMined) {
             rowElement.insertAdjacentHTML(
                 'beforeend',
-                `<div class="field-${isMine ? 'mine' : 'closed'}" 
+                `<div class="field-${isMined ? 'mine' : 'closed'}" 
                             data-row="${row}" 
                             data-col="${col}"
                             data-flagged="false"></div>`);
@@ -112,16 +112,20 @@ function gameEngine() {
     }
 
     // ---------------------------------------------- checking functions -----------------------------------------------
+    function isClosed(field) {
+        return field.className === fieldType.closed;
+    }
+
+    function isMined(field) {
+        return field.className === fieldType.mine;
+    }
+
     function isFlagged(field) {
         return field.dataset.flagged === "true";
     }
 
-    function isMine(field) {
-        return field.className === fieldType.mine;
-    }
-
-    function isNotClosedAndNotMine(field) {
-        return field.className === fieldType.closed || field.className === fieldType.mine;
+    function isNoMinesInNeighborhood(field) {
+        return !field.textContent;
     }
 
     function isTimerNotRunning() {
@@ -164,52 +168,63 @@ function gameEngine() {
     }
 
     function clickOnFieldHandler(event) {
-        function noMinesInNeighborhood(field) {
-            return !field.textContent;
+        function isOutOfTheBoard(mainField, neighborField) {
+            return (neighborField.x < 0 || neighborField.y < 0 || neighborField.x >= cols || neighborField.y >= rows)
         }
 
-        function boundaryConditionNotMet(mainField, neigborField) {
-            return (
-                // the own field
-                (mainField.x === 0 && mainField.y === 0)
-                // out of the board
-                || (neigborField.x < 0 || neigborField.x >= cols || neigborField.y < 0 || neigborField.y >= rows)
-            )
+        function setOpenField(field) {
+            field.setAttribute('class', fieldType.opended);
         }
 
-        function getFieldToCheck(seekedPos) {
-            const board = Array.from(document.querySelectorAll('div[data-row]'));  // all fields on the board
-            return board.find(function (node) {
-                return parseInt(node.dataset.col) === seekedPos.x && parseInt(node.dataset.row) === seekedPos.y;
+        function getFieldToCheck(board, seekedPos) {
+            return board.find(function (field) {
+                return parseInt(field.dataset.col) === seekedPos.x && parseInt(field.dataset.row) === seekedPos.y;
             })
         }
 
-        function openField(field, fieldPos) {
-            function checkNeighborMineNumber(fieldPos) {
-                let neighborMineNumber = 0;
-                for (let x = -1; x <= 1; x++) {  // loop for cols
-                    for (let y = -1; y <= 1; y++) {  // loop for rows
-                        let neighborFieldPos = {x: fieldPos.x + x, y: fieldPos.y + y};
+        function checkNeighborMineNumber(fieldPos) {
+            const board = Array.from(document.querySelectorAll('div[data-row]'));  // all fields on the board
 
-                        if (boundaryConditionNotMet(fieldPos, neighborFieldPos)) { continue; }
-    
-                        // looks for the mine
-                        let fieldToCheck = getFieldToCheck(neighborFieldPos);
-                        if (isMine(fieldToCheck)) { neighborMineNumber++; }
+            let neighborMineNumber = 0;
+            for (let x = -1; x <= 1; x++) {  // loop for cols
+                for (let y = -1; y <= 1; y++) {  // loop for rows
+                    let neighborFieldPos = {x: fieldPos.x + x, y: fieldPos.y + y};
+                    if (isOutOfTheBoard(fieldPos, neighborFieldPos)) { continue; }
+
+                    // looks for the mine
+                    let neighborField = getFieldToCheck(board, neighborFieldPos);
+                    if (isMined(neighborField)) {
+                        neighborMineNumber++;
                     }
                 }
-    
-                return neighborMineNumber;
             }
 
-            // ------------- openField() main code -------------
-            field.setAttribute('class', fieldType.open);
+            return neighborMineNumber;
+        }
+
+        function openField(field, fieldPos) {
+            setOpenField(field);
             let neighborMineNumber = checkNeighborMineNumber(fieldPos);
             if (neighborMineNumber > 0) { field.textContent = neighborMineNumber; }
         }
 
-        function openFieldsInNeighborhood(fieldPos) {
-            checkNeighborhoodFields('lookForNoNeighborhoodMine', cFieldPos)
+        function openFieldsInNeighborhood(mainField, mainFieldPos) {
+            const board = Array.from(document.querySelectorAll('div[data-row]'));  // all fields on the board
+
+            for (let x = -1; x <= 1; x++) {  // loop for cols
+                for (let y = -1; y <= 1; y++) {  // loop for rows
+                    let neighborFieldPos = {x: mainFieldPos.x + x, y: mainFieldPos.y + y};
+                    if (isOutOfTheBoard(mainFieldPos, neighborFieldPos)) { continue; }
+
+                    let neighborField = getFieldToCheck(board, neighborFieldPos);
+                    if (!isClosed(neighborField)) { continue; }  // field should be closed
+
+                    openField(neighborField, neighborFieldPos);
+                    if (isNoMinesInNeighborhood(neighborField)) {  // continue opening fields if the field is unnumbered
+                        openFieldsInNeighborhood(neighborField, neighborFieldPos);
+                    }
+                }
+            }
         }
 
         function gameOver(field) {
@@ -231,8 +246,8 @@ function gameEngine() {
                 const cFieldPos = {x: parseInt(cField.dataset.col), y: parseInt(cField.dataset.row)};
 
                 openField(cField, cFieldPos);
-                if (noMinesInNeighborhood(cField)) {
-                    openFieldsInNeighborhood(cFieldPos);
+                if (isNoMinesInNeighborhood(cField)) {
+                    openFieldsInNeighborhood(cField, cFieldPos);
                 }
                 break;
 
@@ -261,7 +276,7 @@ function gameEngine() {
         if (isTimerNotRunning()) { timerStart(); }
 
         const cField = event.target;
-        if (isNotClosedAndNotMine(cField)) {
+        if (isClosed(cField) || isMined(cField)) {
             switch (cField.dataset.flagged) {
                 case "false":
                     placeFlag();
