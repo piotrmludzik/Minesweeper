@@ -93,6 +93,23 @@ function gameEngine() {
         }
     }
 
+    function checkVictory() {
+        function isVictory() {
+            const board = Array.from(document.querySelectorAll('div[data-row]'));  // all fields on the board
+
+            for (index in board) {
+                if (isClosed(board[index])) { return false;}
+            }
+    
+            return true;
+        }
+
+        if (isVictory()) {
+            timerStop();
+            alert("You win!");
+        }
+    }
+
     // ------------------------------------------------ timer functions ------------------------------------------------
     function showTime() {
         timerCounter.value++;
@@ -249,6 +266,8 @@ function gameEngine() {
                 if (isNoMinesInNeighborhood(cField)) {
                     openFieldsInNeighborhood(cField, cFieldPos);
                 }
+
+                checkVictory();
                 break;
 
             case fieldType.mine:
@@ -280,6 +299,7 @@ function gameEngine() {
             switch (cField.dataset.flagged) {
                 case "false":
                     placeFlag();
+                    checkVictory();
                     break;
 
                 case "true":
