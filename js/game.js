@@ -237,7 +237,8 @@ function gameEngine() {
         
                 return true;
             }
-    
+
+            // ------------- checkVictory() main code -------------
             if (isVictory()) {
                 timerStop();
                 alert("You win!");
@@ -245,10 +246,23 @@ function gameEngine() {
         }
 
         function gameOver(field) {
+            function showWrongFlags() {
+                const board = Array.from(document.querySelectorAll('div[data-row]'));  // all fields on the board
+    
+                for (index in board) {
+                    if (isFlagged(board[index]) && !isMined(board[index])) {
+                        board[index].style.backgroundImage = 'url("/img/mine-missing.png")';  // clicked mine
+                    }
+                }
+            }
+
+            // ------------- gameOver() main code -------------
             timerStop();
-            field.style.backgroundImage = 'url("/img/mine-selected.png")';
-            allMinesChangeGraphic('url("/img/mine.png")');  // show all mines
             removeFieldsEventListener();  // block fields from clicking
+
+            field.style.backgroundImage = 'url("/img/mine-selected.png")';  // clicked mine
+            allMinesChangeGraphic('url("/img/mine.png")');  // show all mines
+            showWrongFlags();
         }
 
         // ------------- clickOnFieldHandler() main code -------------
