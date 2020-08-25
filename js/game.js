@@ -93,23 +93,6 @@ function gameEngine() {
         }
     }
 
-    function checkVictory() {
-        function isVictory() {
-            const board = Array.from(document.querySelectorAll('div[data-row]'));  // all fields on the board
-
-            for (index in board) {
-                if (isClosed(board[index])) { return false;}
-            }
-    
-            return true;
-        }
-
-        if (isVictory()) {
-            timerStop();
-            alert("You win!");
-        }
-    }
-
     // ------------------------------------------------ timer functions ------------------------------------------------
     function showTime() {
         timerCounter.value++;
@@ -244,6 +227,23 @@ function gameEngine() {
             }
         }
 
+        function checkVictory() {
+            function isVictory() {
+                const board = Array.from(document.querySelectorAll('div[data-row]'));  // all fields on the board
+    
+                for (index in board) {
+                    if (isClosed(board[index])) { return false;}
+                }
+        
+                return true;
+            }
+    
+            if (isVictory()) {
+                timerStop();
+                alert("You win!");
+            }
+        }
+
         function gameOver(field) {
             timerStop();
             field.style.backgroundImage = 'url("/img/mine-selected.png")';
@@ -299,7 +299,6 @@ function gameEngine() {
             switch (cField.dataset.flagged) {
                 case "false":
                     placeFlag();
-                    checkVictory();
                     break;
 
                 case "true":
