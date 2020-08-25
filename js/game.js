@@ -10,6 +10,7 @@ const urlParams = new URLSearchParams(queryString);
 const rows = parseInt(urlParams.get('rows'));
 const cols = parseInt(urlParams.get('cols'));
 const mineLeftCounter = document.querySelector('#mine-left-counter');
+const gameButton = document.querySelector('#game-button');
 const timerCounter = document.querySelector('#elapsed-time-counter');
 
 const fieldType = {
@@ -18,6 +19,12 @@ const fieldType = {
     mine: 'field-mine',
     flag: 'field-flag'
 };
+
+const buttonName = {
+    gameInProgress: 'inprogress',
+    win: 'win',
+    gameOver: 'gameover'
+}
 
 let timerIntervalID = null;
 
@@ -93,6 +100,10 @@ function gameEngine() {
         }
     }
 
+    function changeGameButton(name) {
+        gameButton.src = `img/game_${name}.png`;
+    }
+
     // ------------------------------------------------ timer functions ------------------------------------------------
     function showTime() {
         timerCounter.value++;
@@ -162,6 +173,7 @@ function gameEngine() {
         // ------------- createNewGameHandler main code -------------
         deleteGameFields();
         allMinesChangeGraphic('url("/img/field-closed.png")')  // hide all mines
+        changeGameButton(buttonName.gameInProgress);
         gameInit();  // create new board
         timerReset();
         addFieldsEventListener();
@@ -241,6 +253,7 @@ function gameEngine() {
             // ------------- checkVictory() main code -------------
             if (isVictory()) {
                 timerStop();
+                changeGameButton(buttonName.win);
                 alert("You win!");
             }
         }
@@ -260,6 +273,7 @@ function gameEngine() {
             timerStop();
             removeFieldsEventListener();  // block fields from clicking
 
+            changeGameButton(buttonName.gameOver);
             field.style.backgroundImage = 'url("/img/mine-selected.png")';  // clicked mine
             allMinesChangeGraphic('url("/img/mine.png")');  // show all mines
             showWrongFlags();
