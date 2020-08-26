@@ -20,6 +20,17 @@ const fieldType = {
     flag: 'field-flag'
 };
 
+const minesNumberColor = {
+    1: 'blue',
+    2: 'green',
+    3: 'red',
+    4: 'darkblue',
+    5: 'darkred',
+    6: 'darkcyan',
+    7: 'black',
+    8: 'darkgray'
+};
+
 const buttonName = {
     gameInProgress: 'inprogress',
     win: 'win',
@@ -170,7 +181,7 @@ function gameEngine() {
             }
         }
 
-        // ------------- createNewGameHandler main code -------------
+        // ------------- createNewGameHandler() main code -------------
         deleteGameFields();
         allMinesChangeGraphic('url("/img/field-closed.png")')  // hide all mines
         changeGameButton(buttonName.gameInProgress);
@@ -197,7 +208,7 @@ function gameEngine() {
         function checkNeighborMineNumber(fieldPos) {
             const board = Array.from(document.querySelectorAll('div[data-row]'));  // all fields on the board
 
-            let neighborMineNumber = 0;
+            let neighborMinesNumber = 0;
             for (let x = -1; x <= 1; x++) {  // loop for cols
                 for (let y = -1; y <= 1; y++) {  // loop for rows
                     let neighborFieldPos = {x: fieldPos.x + x, y: fieldPos.y + y};
@@ -206,18 +217,24 @@ function gameEngine() {
                     // looks for the mine
                     let neighborField = getFieldToCheck(board, neighborFieldPos);
                     if (isMined(neighborField)) {
-                        neighborMineNumber++;
+                        neighborMinesNumber++;
                     }
                 }
             }
 
-            return neighborMineNumber;
+            return neighborMinesNumber;
         }
 
         function openField(field, fieldPos) {
+            function setMinesNumber(field, minesNumber) {
+                field.style.color = minesNumberColor[minesNumber];
+                field.textContent = minesNumber;
+            }
+
+            // ------------- openField() main code -------------
             setOpenField(field);
-            let neighborMineNumber = checkNeighborMineNumber(fieldPos);
-            if (neighborMineNumber > 0) { field.textContent = neighborMineNumber; }
+            let neighborMinesNumber = checkNeighborMineNumber(fieldPos);
+            if (neighborMinesNumber > 0) { setMinesNumber(field, neighborMinesNumber) }
         }
 
         function openFieldsInNeighborhood(mainField, mainFieldPos) {
