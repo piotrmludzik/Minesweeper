@@ -56,17 +56,17 @@ h1 {
 .game-field .row .field-closed {
     height: 24px;
     width: 24px;
-    background: url('/img/field-closed.png');
+    background: url('../img/field-closed.png');
 }
 
 .game-field .row .field-opended {
     height: 24px;
     width: 24px;
-    background: url('/img/field-opended.png');
+    background: url('../img/field-opended.png');
 }
 
 .game-field .row .field-mine {
     height: 24px;
     width: 24px;
-    background: url('/img/field-closed.png');
+    background: url('../img/field-closed.png');
 }

@@ -183,7 +183,7 @@ function gameEngine() {
 
         // ------------- createNewGameHandler() main code -------------
         deleteGameFields();
-        allMinesChangeGraphic('url("/img/field-closed.png")')  // hide all mines
+        allMinesChangeGraphic('url("../img/field-closed.png")')  // hide all mines
         changeGameButton(buttonName.gameInProgress);
         gameInit();  // create new board
         timerReset();
@@ -281,7 +281,7 @@ function gameEngine() {
     
                 for (index in board) {
                     if (isFlagged(board[index]) && !isMined(board[index])) {
-                        board[index].style.backgroundImage = 'url("/img/mine-missing.png")';  // clicked mine
+                        board[index].style.backgroundImage = 'url("../img/mine-missing.png")';  // clicked mine
                     }
                 }
             }
@@ -291,8 +291,8 @@ function gameEngine() {
             removeFieldsEventListener();  // block fields from clicking
 
             changeGameButton(buttonName.gameOver);
-            field.style.backgroundImage = 'url("/img/mine-selected.png")';  // clicked mine
-            allMinesChangeGraphic('url("/img/mine.png")');  // show all mines
+            field.style.backgroundImage = 'url("img/mine-selected.png")';  // clicked mine
+            allMinesChangeGraphic('url("../img/mine.png")');  // show all mines
             showWrongFlags();
         }
 
@@ -325,7 +325,7 @@ function gameEngine() {
         function placeFlag() {
             if (mineLeftCounter.value > 0) {
                 cField.dataset.flagged = "true";
-                cField.style.backgroundImage = 'url("/img/flag.png")';
+                cField.style.backgroundImage = 'url("img/flag.png")';
                 mineLeftCounter.value--;
             }
         }
