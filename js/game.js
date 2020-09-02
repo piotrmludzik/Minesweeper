@@ -94,7 +94,7 @@ function gameInit() {
         mineLeftCounter.value = mineCount;
     }
 
-    // ------------- init() main code -------------
+    // ------------- initGame() main code -------------
     showMineLeftValue();
     drawBoard();
 }
