@@ -90,8 +90,7 @@ function gameInit() {
     }
 
     function showMineLeftValue() {
-        const mineCount = parseInt(urlParams.get('mines'));
-        mineLeftCounter.value = mineCount;
+        mineLeftCounter.value = parseInt(urlParams.get('mines'));
     }
 
     // ------------- initGame() main code -------------
@@ -260,7 +259,7 @@ function gameEngine() {
             function isVictory() {
                 const board = Array.from(document.querySelectorAll('div[data-row]'));  // all fields on the board
     
-                for (index in board) {
+                for (let index in board) {
                     if (isClosed(board[index])) { return false;}
                 }
         
@@ -279,7 +278,7 @@ function gameEngine() {
             function showWrongFlags() {
                 const board = Array.from(document.querySelectorAll('div[data-row]'));  // all fields on the board
     
-                for (index in board) {
+                for (let index in board) {
                     if (isFlagged(board[index]) && !isMined(board[index])) {
                         board[index].style.backgroundImage = 'url("../img/mine-missing.png")';  // clicked mine
                     }
@@ -302,7 +301,7 @@ function gameEngine() {
         if (isTimerNotRunning()) { timerStart(); }
         if (isFlagged(cField)) { return; }  // block the flagged field
 
-        cFieldType = cField.className;
+        let cFieldType = cField.className;
         switch (cFieldType) {
             case fieldType.closed:
                 const cFieldPos = {x: parseInt(cField.dataset.col), y: parseInt(cField.dataset.row)};
