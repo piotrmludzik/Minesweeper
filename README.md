@@ -7,7 +7,7 @@ It is a simple WEB application, without server parts. It includes all the basic 
 graphics.
 
 The application was created as a task at [CodeCool](https://codecool.com/en/) school. A description of the task
-as well as additional information can be found here: [Exercise](https://github.com/piotrmludzik/api-wars/wiki/Exercise).
+as well as additional information can be found here: [Exercise](https://github.com/piotrmludzik/minesweeper/wiki/Exercise).
 Learning programming while writing your favorite game is a great pleasure!
 
 
@@ -51,5 +51,5 @@ The content of the exercise and the initial code in the repository are owned by 
 Copyright (c) 2020 by Piotr Mludzik. All rights reserved. Copyrights apply only to the code itself,
 not to the game idea, graphics, or any other rights that the game owner owns.
 
-Code in this repository is licensed under MIT license. See [LICENSE](https://github.com/piotrmludzik/api-wars/blob/master/LICENSE).
+Code in this repository is licensed under MIT license. See [LICENSE](https://github.com/piotrmludzik/minesweeper/blob/master/LICENSE).
 
