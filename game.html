@@ -8,14 +8,15 @@
     <link rel="stylesheet" href="css/style.css">
     <script src="js/game.js" defer></script>
 </head>
+
 <body>
+    <h1>Minesweeper</h1>
+    <div class="stats">
+        <input type="text" id="mine-left-counter" disabled value="0" data-all-mines-count="0">
+        <img id="game-button" src="img/game_inprogress.png">
+        <input type="text" id="elapsed-time-counter" disabled value="0">
+    </div>
 
-<div class="stats">
-    <input type="text" id="mine-left-counter" disabled value="0" data-all-mines-count="0">
-    <input type="text" id="elapsed-time-counter" disabled value="0">
-</div>
-<div class="game-field" data-cell-width="16" data-cell-height="16">
-
-</div>
+    <div class="game-field" data-cell-width="24" data-cell-height="24"></div>
 </body>
 </html>

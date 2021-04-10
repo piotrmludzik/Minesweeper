@@ -1,1 +1,9 @@
+### Webstorm ###
 /.idea/
+
+### temporary ###
+/temp
+.temp
+
+### GitHub Wiki source folder ###
+wiki/
